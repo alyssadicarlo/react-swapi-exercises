@@ -1,23 +1,37 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import CharacterList from './components/CharacterList';
+import CharacterProfile from './components/CharacterProfile';
+
 import './App.css';
 
 function App() {
+  const [characters, setCharacters] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const response = await _fetchCharacters();
+      setCharacters(response);
+    })();
+  }, [setCharacters]);
+
+  const _fetchCharacters = async () => {
+    const response = await fetch(
+      `https://swapi.dev/api/people/`
+    ).then(response => response.json());
+    return response.results;
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+        <Route path="/">
+          <CharacterList characters={characters} />
+        </Route>
+        <Route path="/character/:id">
+          <CharacterProfile characters={characters} />
+        </Route>
+      </Router>
     </div>
   );
 }
